@@ -134,9 +134,9 @@ export default function PublicMap() {
             LIVE
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pr-16">
            {user && (
-             <button onClick={() => navigate(-1)} className="text-sm font-bold bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded transition-colors text-white mr-2 border border-slate-700">
+             <button onClick={() => navigate(-1)} className="text-sm font-bold bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded transition-colors text-white border border-slate-700">
                &larr; GO BACK
              </button>
            )}

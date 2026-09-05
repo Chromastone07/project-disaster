@@ -62,22 +62,7 @@ export default function AuthorityExport() {
            </div>
         </div>
       </div>
-      
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Recent Audit Activity</h3>
-         <div className="space-y-4">
-            <div className="flex items-center gap-4 text-sm text-slate-600">
-              <span className="font-mono text-xs bg-slate-100 px-2 py-1 rounded">2026-04-28 14:22 UTC</span>
-              <span>Exported complete snapshot</span>
-              <span className="ml-auto text-xs font-bold">Admin User</span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-slate-600">
-              <span className="font-mono text-xs bg-slate-100 px-2 py-1 rounded">2026-04-28 09:15 UTC</span>
-              <span>Modified Resource limits on BKC Center</span>
-              <span className="ml-auto text-xs font-bold">Admin User</span>
-            </div>
-         </div>
-      </div>
+
     </div>
   );
 }

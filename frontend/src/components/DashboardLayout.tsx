@@ -116,11 +116,8 @@ export default function DashboardLayout({ children, title = "Dashboard" }: { chi
               LIVE: SYSTEM ACTIVE
             </span>
           </div>
-          <div className="flex items-center gap-6 pr-12">
-            <div className="text-right">
-              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Region</p>
-              <p className="text-sm font-medium">Global Scope</p>
-            </div>
+          <div className="flex items-center gap-6 pr-16">
+
           </div>
         </header>
 

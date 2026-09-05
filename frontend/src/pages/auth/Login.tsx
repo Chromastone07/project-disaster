@@ -211,10 +211,6 @@ export default function Login() {
             >
                Register new admin account
             </button>
-            <p className="text-xs text-slate-400 mt-4 bg-slate-50 p-2 rounded border border-slate-100">
-               If you already seeded the database, you can login with <br />
-               <span className="font-mono bg-white px-1 font-bold">admin@cserp.gov</span> / <span className="font-mono bg-white px-1 font-bold">Admin@2024</span>
-            </p>
          </div>
       )}
 

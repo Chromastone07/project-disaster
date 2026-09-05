@@ -1,44 +1,56 @@
-import React, { useEffect } from 'react';
-import { useAuthStore } from '../store/authStore';
-import { useSSE } from '../hooks/useSSE';
+import React, { useEffect, useRef } from 'react';
+import { useAppStore } from '../store/appStore';
 
-// Simple global notification toast manager
+// Listens to store changes driven by the single SSE connection in App.tsx
+// instead of opening a duplicate SSE connection.
 export default function NotificationToast() {
-  const { token } = useAuthStore();
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
-  const sseData = useSSE(`${apiUrl}/notifications/stream`);
+  const { reports, broadcasts, civic_issues } = useAppStore();
+  const [toasts, setToasts] = React.useState<{id: number; message: string; type: string}[]>([]);
   
-  const [toasts, setToasts] = React.useState<{id: number; message: string; type: string; level?: string}[]>([]);
+  // Track previous counts to detect new items
+  const prevCounts = useRef({ reports: 0, broadcasts: 0, civic_issues: 0 });
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (sseData && sseData.type && sseData.type !== 'heartbeat') {
-      const newToast = {
-        id: Date.now(),
-        message: sseData.type === 'report_created' ? 'Unverified incident reported (Pending review)' : 
-                 sseData.type === 'report_updated' ? 'Report status updated' : 
-                 sseData.type === 'civic_issue_created' ? 'New civic issue reported' : 
-                 sseData.type === 'civic_issue_updated' ? 'Civic issue status updated' : 
-                 sseData.type === 'broadcast_alert' ? sseData.data?.message || 'Emergency Broadcast' :
-                 'System notification received',
-        type: sseData.type === 'broadcast_alert' || sseData.type === 'report_created' ? 'alert' : 'info',
-        level: sseData.data?.level || 'info'
-      };
-      
-      setToasts(prev => [newToast, ...prev].slice(0, 5)); // Keep max 5
-      
-      // Auto dismiss, but keep alerts longer
-      setTimeout(() => {
-        setToasts(prev => prev.filter(t => t.id !== newToast.id));
-      }, newToast.type === 'alert' ? 15000 : 5000);
+    // Skip the first render (initial data load)
+    if (!initialized.current) {
+      prevCounts.current = { reports: reports.length, broadcasts: broadcasts.length, civic_issues: civic_issues.length };
+      initialized.current = true;
+      return;
     }
-  }, [sseData]);
+
+    const newToasts: {id: number; message: string; type: string}[] = [];
+
+    if (reports.length > prevCounts.current.reports) {
+      newToasts.push({ id: Date.now(), message: 'New incident reported (Pending review)', type: 'alert' });
+    }
+    if (broadcasts.length > prevCounts.current.broadcasts) {
+      const latest = broadcasts[0];
+      newToasts.push({ id: Date.now() + 1, message: latest?.message || 'Emergency Broadcast', type: 'alert' });
+    }
+    if (civic_issues.length > prevCounts.current.civic_issues) {
+      newToasts.push({ id: Date.now() + 2, message: 'New civic issue reported', type: 'info' });
+    }
+
+    prevCounts.current = { reports: reports.length, broadcasts: broadcasts.length, civic_issues: civic_issues.length };
+
+    if (newToasts.length > 0) {
+      setToasts(prev => [...newToasts, ...prev].slice(0, 5));
+      // Auto dismiss
+      newToasts.forEach(t => {
+        setTimeout(() => {
+          setToasts(prev => prev.filter(x => x.id !== t.id));
+        }, t.type === 'alert' ? 10000 : 5000);
+      });
+    }
+  }, [reports.length, broadcasts.length, civic_issues.length]);
 
   if (toasts.length === 0) return null;
 
   return (
     <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2">
       {toasts.map(toast => (
-        <div key={toast.id} className={`bg-slate-900 text-white px-4 py-3 rounded shadow-lg flex items-center gap-3 backdrop-blur bg-opacity-90 border cursor-pointer animate-in fade-in slide-in-from-top-4 ${toast.level === 'critical' ? 'border-rose-500' : 'border-slate-700'}`} onClick={() => setToasts(ts => ts.filter(t => t.id !== toast.id))}>
+        <div key={toast.id} className={`bg-slate-900 text-white px-4 py-3 rounded shadow-lg flex items-center gap-3 backdrop-blur bg-opacity-90 border cursor-pointer ${toast.type === 'alert' ? 'border-rose-500' : 'border-slate-700'}`} onClick={() => setToasts(ts => ts.filter(t => t.id !== toast.id))}>
           <div className={`w-2 h-2 rounded-full animate-pulse ${toast.type === 'alert' ? 'bg-rose-500' : 'bg-blue-500'}`}></div>
           <p className="text-sm font-medium">{toast.message}</p>
         </div>

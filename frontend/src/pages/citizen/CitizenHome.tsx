@@ -8,7 +8,7 @@ export default function CitizenHome() {
   const { user, token } = useAuthStore();
   const { reports, broadcasts, addContribution } = useAppStore();
 
-  const myReports = reports.filter(r => r.reporter_id === user?.id || !r.reporter_id); // In a real app we'd filter strictly by reporter_id
+  const myReports = reports.filter(r => r.reporter_id === user?.id);
   const activeReports = reports.filter(r => r.status === 'active' || r.status === 'in_progress');
   const recentBroadcasts = broadcasts.slice(0, 3);
   
@@ -105,20 +105,7 @@ export default function CitizenHome() {
            </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Contribute Resources</h3>
-           <p className="text-sm text-slate-600 mb-4">Have supplies to donate? Let us know what you can contribute, and authorities will register it if needed.</p>
-           <form onSubmit={handleContribute} className="flex flex-col gap-3">
-             <div className="grid grid-cols-2 gap-3">
-               <input required type="text" placeholder="What are you offering? (e.g. 50 Water bottles)" className="col-span-2 p-2 border border-slate-300 rounded text-sm" value={contributionForm.item_name} onChange={e => setContributionForm({...contributionForm, item_name: e.target.value})} />
-               <input required type="number" min="1" placeholder="Quantity" className="p-2 border border-slate-300 rounded text-sm" value={contributionForm.quantity} onChange={e => setContributionForm({...contributionForm, quantity: Number(e.target.value)})} />
-               <input required type="text" placeholder="Unit (e.g. boxes, units)" className="p-2 border border-slate-300 rounded text-sm" value={contributionForm.unit} onChange={e => setContributionForm({...contributionForm, unit: e.target.value})} />
-             </div>
-             <button disabled={isSubmittings} type="submit" className="bg-emerald-600 text-white font-bold p-2 text-sm rounded shadow hover:bg-emerald-700 disabled:opacity-50 transition">
-               {isSubmittings ? 'Submitting...' : 'Offer Contribution'}
-             </button>
-           </form>
-        </div>
+
       </div>
       
       <div className="col-span-1 space-y-6">
